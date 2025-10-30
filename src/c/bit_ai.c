@@ -1,13 +1,25 @@
 #include <pebble.h>
-#include "claude_spark.h"
+#include "ai_spark.h"
 #include "chat_window.h"
 #include "setup_window.h"
 
 static Window *s_chat_window;
 static Window *s_setup_window;
 static bool s_is_ready = true;  // Assume ready initially, will be corrected by JS
+static char s_provider_name[32] = "AI";  // Default provider name
 
 static void inbox_received_callback(DictionaryIterator *iterator, void *context) {
+  // Check for PROVIDER_NAME message
+  Tuple *provider_name_tuple = dict_find(iterator, MESSAGE_KEY_PROVIDER_NAME);
+  if (provider_name_tuple) {
+    snprintf(s_provider_name, sizeof(s_provider_name), "%s", provider_name_tuple->value->cstring);
+    APP_LOG(APP_LOG_LEVEL_DEBUG, "Received PROVIDER_NAME: %s", s_provider_name);
+
+    // Update windows with new provider name
+    chat_window_set_provider_name(s_provider_name);
+    setup_window_set_provider_name(s_provider_name);
+  }
+
   // Check for READY_STATUS message
   Tuple *ready_status_tuple = dict_find(iterator, MESSAGE_KEY_READY_STATUS);
   if (ready_status_tuple) {
@@ -79,8 +91,8 @@ static void outbox_sent_callback(DictionaryIterator *iterator, void *context) {
 }
 
 static void prv_init(void) {
-  // Initialize Claude spark system
-  claude_spark_init();
+  // Initialize AI spark system
+  ai_spark_init();
 
   // Initialize AppMessage
   app_message_register_inbox_received(inbox_received_callback);
@@ -109,8 +121,8 @@ static void prv_deinit(void) {
     s_setup_window = NULL;
   }
 
-  // Deinitialize Claude spark system
-  claude_spark_deinit();
+  // Deinitialize AI spark system
+  ai_spark_deinit();
 }
 
 int main(void) {

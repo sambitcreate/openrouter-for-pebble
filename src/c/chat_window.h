@@ -31,3 +31,9 @@ void chat_window_set_footer_animating(bool animating);
  * @param iterator Dictionary iterator with message data
  */
 void chat_window_handle_inbox(DictionaryIterator *iterator);
+
+/**
+ * Set the provider name displayed in the chat window.
+ * @param name The provider name to display
+ */
+void chat_window_set_provider_name(const char *name);

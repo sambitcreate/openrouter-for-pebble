@@ -1,30 +1,30 @@
-#include "claude_spark.h"
+#include "ai_spark.h"
 
 // Global state - PDC sequences loaded once
 static GDrawCommandSequence *s_small_sequence = NULL;
 static GDrawCommandSequence *s_large_sequence = NULL;
 
 // Individual spark layer instance
-struct ClaudeSparkLayer {
+struct AISparkLayer {
   Layer *layer;
   AppTimer *timer;
   int frame_index;
   bool is_animating;
-  ClaudeSparkSize size;
+  AISparkSize size;
 };
 
 // Forward declarations
 static void update_proc(Layer *layer, GContext *ctx);
 static void next_frame_handler(void *context);
-static GDrawCommandSequence* get_sequence_for_size(ClaudeSparkSize size);
+static GDrawCommandSequence* get_sequence_for_size(AISparkSize size);
 
-void claude_spark_init(void) {
+void ai_spark_init(void) {
   // Load both PDC sequences
-  s_small_sequence = gdraw_command_sequence_create_with_resource(RESOURCE_ID_CLAUDE_S);
-  s_large_sequence = gdraw_command_sequence_create_with_resource(RESOURCE_ID_CLAUDE_L);
+  s_small_sequence = gdraw_command_sequence_create_with_resource(RESOURCE_ID_AI_S);
+  s_large_sequence = gdraw_command_sequence_create_with_resource(RESOURCE_ID_AI_L);
 
   if (!s_small_sequence || !s_large_sequence) {
-    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to load Claude spark sequences!");
+    APP_LOG(APP_LOG_LEVEL_ERROR, "Failed to load AI spark sequences!");
     return;
   }
 
@@ -48,10 +48,10 @@ void claude_spark_init(void) {
   }
 #endif
 
-  APP_LOG(APP_LOG_LEVEL_INFO, "Claude spark sequences loaded successfully");
+  APP_LOG(APP_LOG_LEVEL_INFO, "AI spark sequences loaded successfully");
 }
 
-void claude_spark_deinit(void) {
+void ai_spark_deinit(void) {
   if (s_small_sequence) {
     gdraw_command_sequence_destroy(s_small_sequence);
     s_small_sequence = NULL;
@@ -62,25 +62,25 @@ void claude_spark_deinit(void) {
   }
 }
 
-ClaudeSparkLayer* claude_spark_layer_create(GRect frame, ClaudeSparkSize size) {
-  ClaudeSparkLayer *spark = malloc(sizeof(ClaudeSparkLayer));
+AISparkLayer* ai_spark_layer_create(GRect frame, AISparkSize size) {
+  AISparkLayer *spark = malloc(sizeof(AISparkLayer));
   if (!spark) {
     return NULL;
   }
 
-  spark->layer = layer_create_with_data(frame, sizeof(ClaudeSparkLayer*));
+  spark->layer = layer_create_with_data(frame, sizeof(AISparkLayer*));
   spark->timer = NULL;
   spark->frame_index = 0;
   spark->is_animating = false;
   spark->size = size;
 
   layer_set_update_proc(spark->layer, update_proc);
-  *((ClaudeSparkLayer**)layer_get_data(spark->layer)) = spark;
+  *((AISparkLayer**)layer_get_data(spark->layer)) = spark;
 
   return spark;
 }
 
-void claude_spark_layer_destroy(ClaudeSparkLayer *spark) {
+void ai_spark_layer_destroy(AISparkLayer *spark) {
   if (!spark) {
     return;
   }
@@ -96,11 +96,11 @@ void claude_spark_layer_destroy(ClaudeSparkLayer *spark) {
   free(spark);
 }
 
-Layer* claude_spark_get_layer(ClaudeSparkLayer *spark) {
+Layer* ai_spark_get_layer(AISparkLayer *spark) {
   return spark ? spark->layer : NULL;
 }
 
-void claude_spark_start_animation(ClaudeSparkLayer *spark) {
+void ai_spark_start_animation(AISparkLayer *spark) {
   if (!spark || spark->is_animating) {
     return;
   }
@@ -117,7 +117,7 @@ void claude_spark_start_animation(ClaudeSparkLayer *spark) {
   spark->timer = app_timer_register(duration, next_frame_handler, spark);
 }
 
-void claude_spark_stop_animation(ClaudeSparkLayer *spark) {
+void ai_spark_stop_animation(AISparkLayer *spark) {
   if (!spark) {
     return;
   }
@@ -130,12 +130,12 @@ void claude_spark_stop_animation(ClaudeSparkLayer *spark) {
   }
 }
 
-void claude_spark_set_frame(ClaudeSparkLayer *spark, int frame_index) {
+void ai_spark_set_frame(AISparkLayer *spark, int frame_index) {
   if (!spark) {
     return;
   }
 
-  claude_spark_stop_animation(spark);
+  ai_spark_stop_animation(spark);
 
   GDrawCommandSequence *seq = get_sequence_for_size(spark->size);
   int num_frames = gdraw_command_sequence_get_num_frames(seq);
@@ -144,34 +144,34 @@ void claude_spark_set_frame(ClaudeSparkLayer *spark, int frame_index) {
   layer_mark_dirty(spark->layer);
 }
 
-void claude_spark_set_size(ClaudeSparkLayer *spark, ClaudeSparkSize size) {
+void ai_spark_set_size(AISparkLayer *spark, AISparkSize size) {
   if (!spark) {
     return;
   }
 
   bool was_animating = spark->is_animating;
-  claude_spark_stop_animation(spark);
+  ai_spark_stop_animation(spark);
 
   spark->size = size;
   layer_mark_dirty(spark->layer);
 
   if (was_animating) {
-    claude_spark_start_animation(spark);
+    ai_spark_start_animation(spark);
   }
 }
 
-bool claude_spark_is_animating(ClaudeSparkLayer *spark) {
+bool ai_spark_is_animating(AISparkLayer *spark) {
   return spark ? spark->is_animating : false;
 }
 
 // Private helper functions
 
-static GDrawCommandSequence* get_sequence_for_size(ClaudeSparkSize size) {
-  return (size == CLAUDE_SPARK_SMALL) ? s_small_sequence : s_large_sequence;
+static GDrawCommandSequence* get_sequence_for_size(AISparkSize size) {
+  return (size == AI_SPARK_SMALL) ? s_small_sequence : s_large_sequence;
 }
 
 static void update_proc(Layer *layer, GContext *ctx) {
-  ClaudeSparkLayer *spark = *((ClaudeSparkLayer**)layer_get_data(layer));
+  AISparkLayer *spark = *((AISparkLayer**)layer_get_data(layer));
   if (!spark) {
     return;
   }
@@ -193,7 +193,7 @@ static void update_proc(Layer *layer, GContext *ctx) {
 }
 
 static void next_frame_handler(void *context) {
-  ClaudeSparkLayer *spark = (ClaudeSparkLayer*)context;
+  AISparkLayer *spark = (AISparkLayer*)context;
   if (!spark || !spark->is_animating) {
     return;
   }

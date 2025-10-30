@@ -4,20 +4,19 @@
 /**
  * Chat Footer Component
  *
- * Displays a small Claude spark icon with "Claude can make mistakes." disclaimer.
+ * Displays a small AI spark icon with disclaimer.
  * Shown at the bottom of the chat conversation.
  */
-
-#define CHAT_FOOTER_DISCLAIMER_TEXT "Claude\ncan make\nmistakes."
 
 typedef struct ChatFooter ChatFooter;
 
 /**
  * Create a new chat footer.
  * @param width Width of the footer (typically content area width)
+ * @param provider_name Name of the AI provider to use in disclaimer
  * @return Pointer to the created footer
  */
-ChatFooter* chat_footer_create(int width);
+ChatFooter* chat_footer_create(int width, const char *provider_name);
 
 /**
  * Destroy a chat footer and free its resources.

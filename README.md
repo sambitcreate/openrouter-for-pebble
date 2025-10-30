@@ -1,13 +1,13 @@
-# Claude for Pebble
+# Bit AI
 
-Chat with Claude AI directly from your Pebble smartwatch. This app is unaffiliated with Anthropic and was made by independent developers as an open-source initiative.
+Chat with AI directly from your Pebble smartwatch. This app is unaffiliated with any AI provider and was made by independent developers as an open-source initiative.
 
 ## Features
 
-- **Voice Input.** Use Pebble's built-in voice dictation to send messages to Claude
-- **Real-time Streaming.** Receive responses from Claude as they're generated, streamed in real-time to your watch
+- **Voice Input.** Use Pebble's built-in voice dictation to send messages to AI
+- **Real-time Streaming.** Receive responses from AI as they're generated, streamed in real-time to your watch
 - **Conversation History.** Maintains context throughout your conversation with scrollable message history
-- **Animated Claude Spark.** Features the iconic Claude spark animation while waiting for responses
+- **Animated AI Spark.** Features an animated spark effect while waiting for responses
 - **Configurable.** Customize API endpoint, model selection, and system prompts
 
 ## Screenshots

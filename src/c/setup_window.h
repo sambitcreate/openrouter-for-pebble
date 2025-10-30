@@ -19,3 +19,9 @@ Window* setup_window_create(void);
  * @param window The window to destroy
  */
 void setup_window_destroy(Window *window);
+
+/**
+ * Set the provider name displayed in the setup window.
+ * @param name The provider name to display
+ */
+void setup_window_set_provider_name(const char *name);

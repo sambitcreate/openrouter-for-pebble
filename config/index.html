@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Claude for Pebble Settings</title>
+  <title>Bit AI Settings</title>
   <style>
     body {
       background-color: white;
@@ -21,29 +21,45 @@
   </style>
 </head>
 <body>
-  <h1>Claude for Pebble</h1>
+  <h1>Bit AI</h1>
 
-  <p>This app is unaffiliated with Anthropic and was made by independent developers as an <a href="https://github.com/breitburg/claude-for-pebble" target="_blank">open-source initiative</a>.</p>
+  <p>This app is unaffiliated with any AI provider and was made by independent developers as an <a href="https://github.com/breitburg/claude-for-pebble" target="_blank">open-source initiative</a>.</p>
 
   <table>
     <tr>
-      <td><label for="api-key">Anthropic API Key</label></td>
-      <td><input type="text" id="api-key" placeholder="sk-ant-..."></td>
+      <td><label for="provider">AI Provider</label></td>
+      <td>
+        <select id="provider">
+          <option value="claude">Claude (Anthropic)</option>
+          <option value="openai">OpenAI</option>
+          <option value="openrouter">OpenRouter</option>
+          <option value="grok">Grok AI</option>
+          <option value="custom">Custom OpenAI-Compatible</option>
+        </select>
+      </td>
     </tr>
-    <tr class="advanced-field">
-      <td><label for="base-url">Base URL</label></td>
-      <td><input type="text" id="base-url" placeholder="https://api.anthropic.com/v1/messages"></td>
+    <tr>
+      <td><label for="provider-name">Provider Display Name</label></td>
+      <td><input type="text" id="provider-name" placeholder="e.g., Claude, GPT-4, etc."></td>
+    </tr>
+    <tr>
+      <td><label for="api-key">API Key</label></td>
+      <td><input type="text" id="api-key" placeholder="Enter your API key"></td>
+    </tr>
+    <tr class="advanced-field custom-endpoint-field">
+      <td><label for="base-url">API Endpoint</label></td>
+      <td><input type="text" id="base-url" placeholder="https://api.example.com/v1/messages"></td>
     </tr>
     <tr class="advanced-field">
       <td><label for="model">Model</label></td>
-      <td><input type="text" id="model" placeholder="claude-haiku-4-5"></td>
+      <td><input type="text" id="model" placeholder="Model name"></td>
     </tr>
     <tr class="advanced-field">
       <td><label for="system-message">System Message</label></td>
-      <td><textarea id="system-message" rows="6" placeholder="System message for Claude"></textarea></td>
+      <td><textarea id="system-message" rows="6" placeholder="System message for the AI"></textarea></td>
     </tr>
-    <tr class="advanced-field">
-      <td><label for="web-search">Enable Web Search</label></td>
+    <tr class="advanced-field claude-only-field">
+      <td><label for="web-search">Enable Web Search (Claude only)</label></td>
       <td><input type="checkbox" id="web-search"></td>
     </tr>
   </table>

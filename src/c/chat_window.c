@@ -1,7 +1,8 @@
 #include "chat_window.h"
 #include "message_bubble.h"
 #include "chat_footer.h"
-#include "claude_spark.h"
+#include "ai_spark.h"
+#include <string.h>
 
 #define MAX_MESSAGES 10
 #define SCROLL_OFFSET 60
@@ -26,7 +27,7 @@ static ChatFooter *s_footer;
 static DictationSession *s_dictation_session;
 
 // Empty state UI (shown when no messages)
-static ClaudeSparkLayer *s_empty_spark;
+static AISparkLayer *s_empty_spark;
 static TextLayer *s_empty_text_layer;
 
 // Message storage (designed for dynamic updates)
@@ -41,6 +42,7 @@ static int s_content_width = 0;
 
 // Chat state
 static bool s_waiting_for_response = false;
+static char s_provider_name[32] = "AI";
 
 // Forward declarations
 static void rebuild_scroll_content(void);
@@ -91,7 +93,7 @@ static void window_load(Window *window) {
   scroll_layer_add_child(s_scroll_layer, s_content_layer);
 
   // Create footer
-  s_footer = chat_footer_create(s_content_width);
+  s_footer = chat_footer_create(s_content_width, s_provider_name);
 
   // Create empty state UI (spark + text) - dynamically centered
   int spark_size = 60;
@@ -104,12 +106,12 @@ static void window_load(Window *window) {
   int start_y = status_bar_height + (available_height - total_content_height) / 2;
 
   // Create and position spark
-  s_empty_spark = claude_spark_layer_create(
+  s_empty_spark = ai_spark_layer_create(
     GRect((s_content_width - spark_size) / 2, start_y, spark_size, spark_size),
-    CLAUDE_SPARK_LARGE
+    AI_SPARK_LARGE
   );
-  layer_add_child(window_layer, claude_spark_get_layer(s_empty_spark));
-  claude_spark_set_frame(s_empty_spark, 4);
+  layer_add_child(window_layer, ai_spark_get_layer(s_empty_spark));
+  ai_spark_set_frame(s_empty_spark, 4);
 
   // Create and position text below spark
   int text_margin = 10;
@@ -133,7 +135,7 @@ static void rebuild_scroll_content(void) {
   if (s_message_count == 0) {
     // Show empty state, hide scroll layer
     layer_set_hidden(scroll_layer_get_layer(s_scroll_layer), true);
-    layer_set_hidden(claude_spark_get_layer(s_empty_spark), false);
+    layer_set_hidden(ai_spark_get_layer(s_empty_spark), false);
     layer_set_hidden(text_layer_get_layer(s_empty_text_layer), false);
 
     // Update action bar for empty state
@@ -142,7 +144,7 @@ static void rebuild_scroll_content(void) {
   } else {
     // Show chat UI, hide empty state
     layer_set_hidden(scroll_layer_get_layer(s_scroll_layer), false);
-    layer_set_hidden(claude_spark_get_layer(s_empty_spark), true);
+    layer_set_hidden(ai_spark_get_layer(s_empty_spark), true);
     layer_set_hidden(text_layer_get_layer(s_empty_text_layer), true);
   }
 
@@ -435,7 +437,7 @@ static void window_unload(Window *window) {
   }
 
   if (s_empty_spark) {
-    claude_spark_layer_destroy(s_empty_spark);
+    ai_spark_layer_destroy(s_empty_spark);
     s_empty_spark = NULL;
   }
 
@@ -520,5 +522,19 @@ void chat_window_set_footer_animating(bool animating) {
     chat_footer_start_animation(s_footer);
   } else {
     chat_footer_stop_animation(s_footer);
+  }
+}
+
+void chat_window_set_provider_name(const char *name) {
+  if (name) {
+    snprintf(s_provider_name, sizeof(s_provider_name), "%s", name);
+
+    // Recreate footer with new provider name if it exists
+    if (s_footer && s_window) {
+      chat_footer_destroy(s_footer);
+      s_footer = chat_footer_create(s_content_width, s_provider_name);
+      // Footer will be re-added to content layer on next rebuild
+      rebuild_scroll_content();
+    }
   }
 }

@@ -1,12 +1,19 @@
 #include "setup_window.h"
+#include <string.h>
 
 static Window *s_window;
 static Layer *s_message_layer;
 static GFont s_font;
+static char s_provider_name[32] = "AI";
+static char s_message_text[64];
+
+static void update_message_text(void) {
+  snprintf(s_message_text, sizeof(s_message_text), "Configure %s\nin settings", s_provider_name);
+}
 
 static void message_layer_update_proc(Layer *layer, GContext *ctx) {
   GRect bounds = layer_get_bounds(layer);
-  const char *text = "Configure Claude\nin settings";
+  const char *text = s_message_text;
 
   graphics_context_set_text_color(ctx, GColorBlack);
 
@@ -67,6 +74,7 @@ static void window_unload(Window *window) {
 }
 
 Window* setup_window_create(void) {
+  update_message_text();  // Initialize message text
   s_window = window_create();
   window_set_background_color(s_window, GColorWhite);
   window_set_window_handlers(s_window, (WindowHandlers) {
@@ -80,5 +88,15 @@ Window* setup_window_create(void) {
 void setup_window_destroy(Window *window) {
   if (window) {
     window_destroy(window);
+  }
+}
+
+void setup_window_set_provider_name(const char *name) {
+  if (name) {
+    snprintf(s_provider_name, sizeof(s_provider_name), "%s", name);
+    update_message_text();
+    if (s_message_layer) {
+      layer_mark_dirty(s_message_layer);
+    }
   }
 }
