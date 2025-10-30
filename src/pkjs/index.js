@@ -220,8 +220,8 @@ Pebble.addEventListener('showConfiguration', function () {
   var systemMessage = localStorage.getItem('system_message') || '';
   var webSearchEnabled = localStorage.getItem('web_search_enabled') || 'false';
 
-  // Build configuration URL
-  var url = 'https://breitburg.github.io/claude-for-pebble/config/';
+  // Build configuration URL - UPDATE THIS with your GitHub Pages URL
+  var url = 'https://YOUR-USERNAME.github.io/YOUR-REPO-NAME/config/';
   url += '?provider=' + encodeURIComponent(provider);
   url += '&provider_name=' + encodeURIComponent(providerName);
   url += '&api_key=' + encodeURIComponent(apiKey);
